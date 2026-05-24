@@ -327,6 +327,17 @@ footer{text-align:center;padding:3rem 0 2rem;color:var(--muted);font-size:.8rem;
 <div class="mc2" data-e="🚫" style="--mcc:#f5c26b"><div class="mti">🚫 Contre-indications clés</div><ul class="ml"><li><span>❌</span><span><b>Valproate</b> — Femme en âge de procréer sans contraception</span></li><li><span>❌</span><span><b>ISRS + IMAO</b> — Risque syndrome sérotoninergique fatal</span></li><li><span>❌</span><span><b>Lithium</b> — Insuffisance rénale, 1er trimestre grossesse</span></li><li><span>❌</span><span><b>BZD longue durée</b> — Sujet âgé (chutes, sédation)</span></li><li><span>❌</span><span><b>Clozapine</b> — Épilepsie non contrôlée</span></li></ul></div>
 <div class="mc2" data-e="🎯" style="--mcc:#a8e063"><div class="mti">🎯 Quelle classe pour quelle indication ?</div><ul class="ml"><li><span>→</span><span><b>Schizophrénie</b> : AP2G en 1ère intention</span></li><li><span>→</span><span><b>Trouble bipolaire</b> : Lithium (manie + prévention)</span></li><li><span>→</span><span><b>EDM</b> : ISRS ou IRSNA</span></li><li><span>→</span><span><b>TAG</b> : ISRS/IRSNA + TCC</span></li><li><span>→</span><span><b>TOC</b> : ISRS (fortes doses) + EPR</span></li><li><span>→</span><span><b>PTSD</b> : Sertraline + psychothérapie</span></li></ul></div>
 <div class="mc2" data-e="🔬" style="--mcc:#a89cf8"><div class="mti">🔬 Mécanismes en bref</div><ul class="ml"><li><span>D2</span><span><b>NL incisifs</b> : Blocage D2 strié ++ → EPS</span></li><li><span>5HT</span><span><b>AP2G</b> : D2 + 5HT2A → moins d'EPS</span></li><li><span>GABA</span><span><b>BZD</b> : Potentialisation GABA-A</span></li><li><span>5HT</span><span><b>ISRS</b> : Inhibition recapture sérotonine</span></li><li><span>Li</span><span><b>Lithium</b> : Inhibition GSK-3β, inositol…</span></li></ul></div>
+<div class="mc2" data-e="🚨" style="--mcc:#e91e63" onclick="openSyndromesModal()">
+<div class="mti">🚨 Syndromes & Intox — CAT détaillée</div>
+  <ul class="ml">
+    <li><span>🔥</span><span><b>Sd malin NL</b> : Fièvre + rigidité + CPK → Dantrolène IV</span></li>
+    <li><span>⚡</span><span><b>Sd sérotoninergique</b> : Triade → Arrêt + cyproheptadine</span></li>
+    <li><span>🧠</span><span><b>Sd anticholinergique</b> : "Sec, rouge, chaud, fou" → Physostigmine</span></li>
+    <li><span>🍺</span><span><b>Sevrage OH/DT</b> : Benzodiazépines + B1 IV</span></li>
+    <li><span>💊</span><span><b>Intox BZD/Opiacés/Paracétamol</b> → Antidotes spécifiques</span></li>
+    <li><span style="font-size:0.7em;color:#e91e63;font-weight:600">👆 Cliquer pour CAT complète</span><span></span></li>
+  </ul>
+</div>
 </div>
 </section>
 
@@ -453,7 +464,6 @@ footer{text-align:center;padding:3rem 0 2rem;color:var(--muted);font-size:.8rem;
     <div class="shint"><span><kbd>↵</kbd> ouvrir</span><span><kbd>Échap</kbd> fermer</span><span><kbd>Ctrl</kbd>+<kbd>K</kbd> raccourci</span></div>
   </div>
 </div>
-
 
 <script>
 // Navigation
@@ -780,6 +790,131 @@ const LEX = [
   {w:'Dysthymie',e:'gr. dys- + thumos (humeur)',c:'humeur',col:'#e879a0',d:'Trouble dépressif persistant caractérisé par une humeur dépressive chronique présente la plupart du temps sur au moins 2 ans, sans remplir les critères complets d\'un EDM. Souvent banalisée. Retentissement important sur la qualité de vie.',ex:'"Elle dit \'être comme ça depuis toujours\', triste en fond, sans jamais vraiment aller bien — 2 ans de suivi confirment une dysthymie chronique sous-jacente."'}
 ];
 
+<!-- MODAL SYNDROMES & INTOX -->
+<div id="modal-syndromes" style="
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.7);
+  z-index:9999;
+  overflow-y:auto;
+  padding:20px;
+" onclick="if(event.target===this)closeSyndromesModal()">
+  <div style="
+    background:#1a1a2e;
+    border:1px solid #e91e63;
+    border-radius:16px;
+    max-width:750px;
+    margin:40px auto;
+    padding:30px;
+    position:relative;
+  ">
+    <button onclick="closeSyndromesModal()" style="
+      position:absolute;top:16px;right:16px;
+      background:#e91e63;border:none;
+      color:#fff;border-radius:50%;
+      width:32px;height:32px;
+      font-size:1.1em;cursor:pointer;
+    ">✕</button>
+
+    <h1 style="color:#e91e63;margin-top:0;border-bottom:2px solid #e91e63;padding-bottom:10px">
+      🚨 Syndromes & Intoxications — CAT détaillée
+    </h1>
+
+    <!-- SMN -->
+    <h2 style="color:#ffd54f;margin-top:20px">🔥 Syndrome Malin des Neuroleptiques (SMN)</h2>
+    <p><b>Terrain :</b> Sous NL ou après arrêt dopaminergique</p>
+    <p><b>Triade :</b> Fièvre élevée + Rigidité musculaire "en tuyau de plomb" + Troubles de conscience</p>
+    <p><b>Biologie :</b> CPK ↑↑↑, leucocytose, myoglobinurie</p>
+    <ul style="margin:8px 0;padding-left:20px;line-height:2">
+      <li>🛑 <b>Arrêt immédiat</b> du NL</li>
+      <li>🏥 Réanimation : hydratation IV, refroidissement</li>
+      <li>💊 <b>Dantrolène</b> 1-2,5 mg/kg IV (relâchant musculaire)</li>
+      <li>💊 <b>Bromocriptine</b> 2,5-10 mg x3/j PO (agoniste D2)</li>
+      <li>⚠️ Éviter tout NL pendant ≥2 semaines après résolution</li>
+    </ul>
+
+    <!-- Sd sérotonine -->
+    <h2 style="color:#ff6b6b;margin-top:25px;border-top:1px solid #333;padding-top:20px">⚡ Syndrome Sérotoninergique</h2>
+    <p><b>Causes :</b> ISRS + IMAO, ISRS + tramadol, ISRS + lithium, surdosage</p>
+    <p><b>Triade de Hunter :</b></p>
+    <ul style="margin:8px 0;padding-left:20px;line-height:2">
+      <li>🧠 <b>Neuro :</b> Agitation, confusion, myoclonies, hyperréflexie</li>
+      <li>🌡️ <b>Végétatif :</b> Hyperthermie, tachycardie, sueurs, diarrhée</li>
+      <li>💪 <b>Moteur :</b> Tremblements, rigidité, clonus</li>
+    </ul>
+    <p><b>CAT :</b></p>
+    <ul style="margin:8px 0;padding-left:20px;line-height:2">
+      <li>🛑 <b>Arrêt immédiat</b> du/des sérotoninergiques</li>
+      <li>💊 <b>Cyproheptadine</b> 4-8 mg PO (antihistaminique / antagoniste 5HT) — option 3ème ligne</li>
+      <li>🏥 Réa si sévère : BZD pour agitation, refroidissement, IOT si besoin</li>
+      <li>⏱️ Résolution en 24-72h si arrêt rapide</li>
+    </ul>
+
+    <!-- Sd anticholinergique -->
+    <h2 style="color:#a8e063;margin-top:25px;border-top:1px solid #333;padding-top:20px">🧠 Syndrome Anticholinergique Central</h2>
+    <p><b>Causes :</b> TCA, antihistaminiques, antiparkinsoniens, atropine, certains AP1G</p>
+    <p><b>Mnémotechnique :</b> <i>"Sec, Rouge, Chaud, Aveugle, Fou, Plein"</i></p>
+    <ul style="margin:8px 0;padding-left:20px;line-height:2">
+      <li>🌵 Sécheresse muqueuses, tachycardie</li>
+      <li>🔴 Flush cutané</li>
+      <li>🌡️ Hyperthermie</li>
+      <li>👁️ Mydriase, vision floue</li>
+      <li>🧠 Confusion, agitation, hallucinations</li>
+      <li>🚽 Rétention urinaire, iléus</li>
+    </ul>
+    <p><b>CAT :</b></p>
+    <ul style="margin:8px 0;padding-left:20px;line-height:2">
+      <li>🛑 Arrêt du toxique</li>
+      <li>💊 <b>Physostigmine</b> 1-2 mg IV lente (anticholinestérasique) — si sévère</li>
+      <li>⚠️ CI si TCA (risque bloc AV)</li>
+      <li>💊 BZD si agitation majeure</li>
+    </ul>
+
+    <!-- Sevrage OH / DT -->
+    <h2 style="color:#5fd4e8;margin-top:25px;border-top:1px solid #333;padding-top:20px">🍺 Sevrage Alcoolique & Delirium Tremens</h2>
+    <p><b>Chronologie :</b></p>
+    <ul style="margin:8px 0;padding-left:20px;line-height:2">
+      <li>⏱️ H6-24 : Tremblement, anxiété, sueurs, tachycardie</li>
+      <li>⏱️ H24-48 : Convulsions de sevrage (généralisées)</li>
+      <li>⏱️ H48-72 : <b>DT</b> — confusion, hallucinations, hyperthermie, dysautonomie</li>
+    </ul>
+    <p><b>CAT :</b></p>
+    <ul style="margin:8px 0;padding-left:20px;line-height:2">
+      <li>💊 <b>BZD de référence</b> : Diazépam PO/IV (protocole CIWA) ou Clorazépate</li>
+      <li>💉 <b>Vitamine B1 500 mg IV x3/j</b> — SYSTÉMATIQUE avant tout apport glucosé</li>
+      <li>🧪 Bilan : iono, Mg, phosphore, NFS, bilan hépatique</li>
+      <li>🏥 DT confirmé → Hospitalisation, ± USC</li>
+      <li>⚠️ Pas de NL en 1ère intention (abaissent seuil épileptogène)</li>
+    </ul>
+
+    <!-- Intox médicaments -->
+    <h2 style="color:#5b8def;margin-top:25px;border-top:1px solid #333;padding-top:20px">💊 Intoxications Médicamenteuses Majeures</h2>
+
+    <h3 style="color:#5b8def;margin-top:15px">▸ Benzodiazépines</h3>
+    <p>Coma calme, bradypnée, hypotonie. <b>Flumazénil</b> 0,3 mg IV /min (max 2 mg).<br>
+    ⚠️ <b>CI si co-intox TCA ou épilepsie</b>. Demi-vie courte → resédation possible.</p>
+
+    <h3 style="color:#5b8def;margin-top:15px">▸ Opiacés</h3>
+    <p>Myosis serré + bradypnée + coma. <b>Naloxone</b> 0,4 mg IV titrée /2-3 min.<br>
+    Demi-vie courte → perfusion entretien si méthadone/fentanyl. Surveillance ≥6h.</p>
+
+    <h3 style="color:#5b8def;margin-top:15px">▸ Paracétamol</h3>
+    <p>Asymptomatique initial → hépatite H24-72. <b>Paracétamolémie à H4</b> + nomogramme Rumack-Matthew.<br>
+    <b>N-acétylcystéine IV</b> (protocole Prescott 21h) si zone toxique. Efficace si &lt;H10.</p>
+
+    <h3 style="color:#5b8def;margin-top:15px">▸ Tricycliques (TCA)</h3>
+    <p>Toxicité <b>cardiaque</b> (QRS large, torsades), <b>neuro</b> (convulsions, coma), anticholinergique.<br>
+    <b>Bicarbonate molaire</b> 100-250 mL IV si QRS &gt;100 ms. <b>JAMAIS de flumazénil.</b><br>
+    Intralipide® si réfractaire.</p>
+
+    <h3 style="color:#5b8def;margin-top:15px">▸ Lithium</h3>
+    <p>Tremblements, ataxie, confusion, convulsions. <b>Lithiémie</b> + créatinine + iono.<br>
+    <b>Épuration extra-rénale</b> si Li &gt;4 mEq/L ou &gt;2,5 mEq/L + clinique sévère/IR.<br>
+    Hydratation NaCl 0,9%. Pas d'antidote spécifique.</p>
+
+  </div>
+</div>
+  
 function bL() {
   const q = (document.getElementById('qL') || {}).value || '';
   let data = LC === 'all' ? LEX : LEX.filter(i => i.c === LC);
@@ -878,7 +1013,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     return idx;
   }
+  function openSyndromesModal() {
+  document.getElementById('modal-syndromes').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  }
+  function closeSyndromesModal() {
+  document.getElementById('modal-syndromes').style.display = 'none';
+  document.body.style.overflow = '';
+  }
 
+  
   let INDEX=[];
   function ensureIndex(){if(INDEX.length===0)INDEX=buildIndex();}
 
