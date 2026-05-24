@@ -731,40 +731,75 @@ document.addEventListener('DOMContentLoaded', function() {
   const res=document.getElementById('sres');
   if(!fab||!ov||!inp||!res)return;
 
-  // Mapping onglet -> libellé + emoji (adapte si besoin)
   const TABS={
-    's-patho':{lbl:'Pathologies',ico:'🧠'},
-    's-ttt':{lbl:'Traitements',ico:'💊'},
-    's-memo':{lbl:'Mémo rapide',ico:'⚡'},
-    's-lex':{lbl:'Lexique',ico:'📖'},
-    's-hospit':{lbl:'Hospitalisations',ico:'🏥'}
+    'patho'  :{secId:'s-patho',  lbl:'Pathologies',     ico:'🧠'},
+    'traitement':{secId:'s-traitement',lbl:'Traitements', ico:'💊'},
+    'memo'   :{secId:'s-memo',   lbl:'Mémo rapide',     ico:'⚡'},
+    'lexique':{secId:'s-lexique',lbl:'Lexique',         ico:'📖'},
+    'hospit' :{secId:'s-hospit', lbl:'Hospitalisations',ico:'🏥'}
   };
 
-  // Indexation : parcourt toutes les sections et extrait les éléments cherchables
   function buildIndex(){
     const idx=[];
-    Object.keys(TABS).forEach(secId=>{
-      const sec=document.getElementById(secId);
-      if(!sec)return;
-      // Cherche les "fiches" : titres de cartes, items de lexique, etc.
-      // Sélecteurs génériques — adapte si tes classes diffèrent
-      const items=sec.querySelectorAll('h2, h3, .pcard, .tcard, .hcard, .lex-item, .mcard, [data-search]');
-      items.forEach((el,i)=>{
-        const title=(el.querySelector('.pt,.tt,.hsi,.lext,.mt')||el).textContent.trim().slice(0,80);
-        const body=el.textContent.trim().replace(/\s+/g,' ').slice(0,400);
-        if(title.length<2)return;
-        // Donne un id si absent pour pouvoir scroller dessus
-        if(!el.id)el.id='sx-'+secId+'-'+i;
-        idx.push({tab:secId,id:el.id,title,body,low:(title+' '+body).toLowerCase()});
+
+    // 1) PATHOLOGIES — depuis l'objet P (données sources)
+    if(typeof P!=='undefined'){
+      Object.keys(P).forEach(key=>{
+        const d=P[key];
+        const body=[d.s||'',(d.cr||[]).join(' '),(d.cl||[]).join(' '),(d.tg||[]).join(' ')].join(' ');
+        idx.push({tabKey:'patho',action:'patho',pid:key,title:d.t,sub:d.c||'',body,low:(d.t+' '+body).toLowerCase()});
       });
+    }
+
+    // 2) TRAITEMENTS — cartes .dc2 (statiques dans le HTML)
+    document.querySelectorAll('#s-traitement .dc2').forEach((el,i)=>{
+      const nm=el.querySelector('.dn');
+      const ge=el.querySelector('.dge');
+      const info=el.querySelector('.di');
+      if(!nm)return;
+      const title=nm.textContent.trim();
+      const sub=ge?ge.textContent.trim():'';
+      const body=(sub+' '+(info?info.textContent.trim():''));
+      if(!el.id)el.id='sx-trt-'+i;
+      idx.push({tabKey:'traitement',action:'scroll',elId:el.id,title,sub,body,low:(title+' '+body).toLowerCase()});
     });
+
+    // 3) MÉMO — toutes les cartes/blocs de la section
+    document.querySelectorAll('#s-memo .card, #s-memo .rc, #s-memo .tc, #s-memo .mb').forEach((el,i)=>{
+      const t=el.querySelector('h3,.rct,.tt,h4');
+      const title=(t?t.textContent:el.textContent).trim().slice(0,80);
+      const body=el.textContent.trim().replace(/\s+/g,' ').slice(0,300);
+      if(title.length<2)return;
+      if(!el.id)el.id='sx-memo-'+i;
+      idx.push({tabKey:'memo',action:'scroll',elId:el.id,title,sub:'',body,low:(title+' '+body).toLowerCase()});
+    });
+
+    // 4) LEXIQUE — depuis l'array LEX
+    if(typeof LEX!=='undefined'){
+      LEX.forEach((it,i)=>{
+        const title=it.w;
+        const body=(it.d||'')+' '+(it.ex||'')+' '+(it.e||'');
+        idx.push({tabKey:'lexique',action:'lex',lexWord:it.w,title,sub:it.e||'',body,low:(title+' '+body).toLowerCase()});
+      });
+    }
+
+    // 5) HOSPITALISATIONS — cartes .hcard et .rc et .tc
+    document.querySelectorAll('#s-hospit .hcard, #s-hospit .rc, #s-hospit .tc').forEach((el,i)=>{
+      const t=el.querySelector('.hsi,.rct,.tt,h3');
+      const title=(t?t.textContent:el.textContent).trim().slice(0,80);
+      const body=el.textContent.trim().replace(/\s+/g,' ').slice(0,300);
+      if(title.length<2)return;
+      if(!el.id)el.id='sx-hosp-'+i;
+      idx.push({tabKey:'hospit',action:'scroll',elId:el.id,title,sub:'',body,low:(title+' '+body).toLowerCase()});
+    });
+
     return idx;
   }
 
   let INDEX=[];
   function ensureIndex(){if(INDEX.length===0)INDEX=buildIndex();}
 
-  function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function highlight(txt,q){
     const e=escapeHtml(txt);
     if(!q)return e;
@@ -774,48 +809,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function search(q){
     q=q.trim().toLowerCase();
-    if(!q){res.innerHTML='<div class="snil">Commence à taper pour rechercher…</div>';return;}
-    const hits=INDEX.filter(it=>it.low.includes(q)).slice(0,60);
-    if(hits.length===0){res.innerHTML='<div class="snil">Aucun résultat pour "<strong>'+escapeHtml(q)+'</strong>"</div>';return;}
-    // Regroupe par onglet
-    const grp={};
-    hits.forEach(h=>{(grp[h.tab]=grp[h.tab]||[]).push(h);});
+    if(!q){res.innerHTML='';return;}
+    const matches=INDEX.filter(it=>it.low.includes(q)).slice(0,80);
+    if(!matches.length){res.innerHTML='<div style="padding:2rem;text-align:center;color:var(--muted)">Aucun résultat pour "'+escapeHtml(q)+'"</div>';return;}
+    const groups={};
+    matches.forEach(m=>{(groups[m.tabKey]=groups[m.tabKey]||[]).push(m);});
     let html='';
-    Object.keys(grp).forEach(tab=>{
-      const t=TABS[tab]||{lbl:tab,ico:'📄'};
-      html+='<div class="sgrp"><div class="sgt">'+t.ico+' '+t.lbl+' ('+grp[tab].length+')</div>';
-      grp[tab].forEach(h=>{
-        const snippet=h.body.length>140?h.body.slice(0,140)+'…':h.body;
-        html+='<div class="sit" data-tab="'+tab+'" data-id="'+h.id+'"><div class="sitt">'+highlight(h.title,q)+'</div><div class="sits">'+highlight(snippet,q)+'</div></div>';
+    Object.keys(TABS).forEach(k=>{
+      if(!groups[k])return;
+      html+='<div class="sgrp"><div class="sgt">'+TABS[k].ico+' '+TABS[k].lbl+' ('+groups[k].length+')</div>';
+      groups[k].forEach((m,i)=>{
+        const dataAttr=m.action==='patho'?'data-pid="'+escapeHtml(m.pid)+'"'
+                     :m.action==='lex'?'data-lex="'+escapeHtml(m.lexWord)+'"'
+                     :'data-el="'+escapeHtml(m.elId)+'"';
+        html+='<div class="sit" data-act="'+m.action+'" data-tab="'+k+'" '+dataAttr+'>'
+            +'<div class="sitt">'+highlight(m.title,q)+'</div>'
+            +(m.sub?'<div class="sits">'+highlight(m.sub,q)+'</div>':'')
+            +'</div>';
       });
       html+='</div>';
     });
     res.innerHTML=html;
     res.querySelectorAll('.sit').forEach(el=>{
-      el.addEventListener('click',()=>goTo(el.dataset.tab,el.dataset.id));
+      el.addEventListener('click',()=>handleClick(el));
     });
   }
 
-  function goTo(tabId,elId){
+  function handleClick(el){
+    const tabKey=el.dataset.tab;
+    const act=el.dataset.act;
+    // Active l'onglet via la fonction go() existante
+    const tabBtn=document.querySelector('.tab.t'+({patho:1,traitement:2,memo:3,lexique:4,hospit:5}[tabKey]));
+    if(tabBtn&&typeof go==='function')go(tabBtn,tabKey);
     close();
-  
-// Active l'onglet : essaie plusieurs méthodes courantes
-    const btn=document.querySelector('[data-tab="'+tabId+'"], [data-target="'+tabId+'"], .tab[href="#'+tabId+'"]');
-    if(btn&&btn.click)btn.click();
-    else{
-// Fallback : montre la section directement
-      document.querySelectorAll('.sec').forEach(s=>s.style.display='none');
-      const sec=document.getElementById(tabId);
-      if(sec)sec.style.display='';
-    }
+
     setTimeout(()=>{
-      const el=document.getElementById(elId);
-      if(el){
-        el.scrollIntoView({behavior:'smooth',block:'center'});
-        el.classList.add('shl');
-        setTimeout(()=>el.classList.remove('shl'),2100);
+      if(act==='patho'&&typeof oP==='function'){
+        oP(el.dataset.pid);
+      } else if(act==='lex'){
+        // Remplit la recherche du lexique et scrolle
+        const qL=document.getElementById('qL');
+        if(qL){qL.value=el.dataset.lex;if(typeof bL==='function')bL();}
+        const lo=document.getElementById('lo');
+        if(lo)lo.scrollIntoView({behavior:'smooth',block:'start'});
+      } else {
+        const target=document.getElementById(el.dataset.el);
+        if(target){
+          target.scrollIntoView({behavior:'smooth',block:'center'});
+          target.classList.add('shl');
+          setTimeout(()=>target.classList.remove('shl'),2100);
+        }
       }
-    },150);
+    },200);
   }
 
   function open(){ensureIndex();ov.classList.add('on');setTimeout(()=>inp.focus(),50);}
