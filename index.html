@@ -136,6 +136,27 @@ tr:last-child td{border-bottom:none;}
 td:first-child{font-weight:700;}
 .ts{margin-bottom:3rem;}
 footer{text-align:center;padding:3rem 0 2rem;color:var(--muted);font-size:.8rem;}
+  /* === RECHERCHE GLOBALE === */
+.sfab{position:fixed;bottom:1.5rem;right:1.5rem;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#a89cf8,#e879a0);border:none;color:#fff;font-size:1.5rem;cursor:pointer;box-shadow:0 6px 20px rgba(168,156,248,.5);z-index:998;transition:transform .2s,box-shadow .2s;display:flex;align-items:center;justify-content:center}
+.sfab:hover{transform:scale(1.1);box-shadow:0 8px 28px rgba(168,156,248,.7)}
+.sov{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:999;display:none;align-items:flex-start;justify-content:center;padding-top:8vh}
+.sov.on{display:flex}
+.smod{width:min(720px,92vw);max-height:80vh;background:var(--card,#1a1a2e);border:1px solid rgba(168,156,248,.3);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.5);display:flex;flex-direction:column;overflow:hidden}
+.sinp{width:100%;padding:1.2rem 1.5rem;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.1);color:#fff;font-size:1.05rem;outline:none}
+.sinp::placeholder{color:rgba(255,255,255,.4)}
+.sres{flex:1;overflow-y:auto;padding:.5rem}
+.sgrp{margin:.5rem 0}
+.sgt{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted,#888);padding:.5rem 1rem;font-weight:600}
+.sit{padding:.7rem 1rem;border-radius:8px;cursor:pointer;transition:background .15s;display:flex;flex-direction:column;gap:.2rem}
+.sit:hover{background:rgba(168,156,248,.15)}
+.sitt{color:#fff;font-weight:500;font-size:.95rem}
+.sits{color:var(--muted,#aaa);font-size:.8rem;line-height:1.3}
+.sit mark{background:rgba(232,121,160,.35);color:#fff;padding:0 2px;border-radius:3px}
+.snil{text-align:center;padding:2rem;color:var(--muted,#888);font-size:.9rem}
+.shint{padding:.6rem 1rem;border-top:1px solid rgba(255,255,255,.08);font-size:.7rem;color:var(--muted,#888);display:flex;gap:1rem;justify-content:center}
+.shint kbd{background:rgba(255,255,255,.1);padding:.1rem .4rem;border-radius:4px;font-family:monospace;font-size:.7rem}
+.shl{animation:shl 2s ease-out;border-radius:8px}
+@keyframes shl{0%{box-shadow:0 0 0 4px rgba(232,121,160,.6)}100%{box-shadow:0 0 0 0 rgba(232,121,160,0)}}
 </style>
 </head>
 <body>
@@ -364,6 +385,19 @@ footer{text-align:center;padding:3rem 0 2rem;color:var(--muted);font-size:.8rem;
 <footer><p>🏥 PsychGuide · Outil pédagogique interne · Ne se substitue pas aux recommandations HAS</p></footer>
 
 <div class="ov" id="ov" onclick="cM(event)"><div class="modal" id="md"></div></div>
+
+  <!-- BOUTON RECHERCHE FLOTTANT -->
+<button class="sfab" id="sfab" title="Rechercher (Ctrl+K)" aria-label="Rechercher">🔎</button>
+
+<!-- PANNEAU RECHERCHE -->
+<div class="sov" id="sov" role="dialog" aria-modal="true">
+  <div class="smod">
+    <input type="text" class="sinp" id="sinp" placeholder="🔎 Rechercher dans tout le guide (pathologie, médicament, terme…)" autocomplete="off">
+    <div class="sres" id="sres"></div>
+    <div class="shint"><span><kbd>↵</kbd> ouvrir</span><span><kbd>Échap</kbd> fermer</span><span><kbd>Ctrl</kbd>+<kbd>K</kbd> raccourci</span></div>
+  </div>
+</div>
+
 
 <script>
 // Navigation
@@ -689,6 +723,112 @@ function sLC(cat, btn) {
 document.addEventListener('DOMContentLoaded', function() {
   if (document.getElementById('s-lexique').classList.contains('on')) bL();
 });
+/* === RECHERCHE GLOBALE === */
+(function(){
+  const fab=document.getElementById('sfab');
+  const ov=document.getElementById('sov');
+  const inp=document.getElementById('sinp');
+  const res=document.getElementById('sres');
+  if(!fab||!ov||!inp||!res)return;
+
+  // Mapping onglet -> libellé + emoji (adapte si besoin)
+  const TABS={
+    's-patho':{lbl:'Pathologies',ico:'🧠'},
+    's-ttt':{lbl:'Traitements',ico:'💊'},
+    's-memo':{lbl:'Mémo rapide',ico:'⚡'},
+    's-lex':{lbl:'Lexique',ico:'📖'},
+    's-hospit':{lbl:'Hospitalisations',ico:'🏥'}
+  };
+
+  // Indexation : parcourt toutes les sections et extrait les éléments cherchables
+  function buildIndex(){
+    const idx=[];
+    Object.keys(TABS).forEach(secId=>{
+      const sec=document.getElementById(secId);
+      if(!sec)return;
+      // Cherche les "fiches" : titres de cartes, items de lexique, etc.
+      // Sélecteurs génériques — adapte si tes classes diffèrent
+      const items=sec.querySelectorAll('h2, h3, .pcard, .tcard, .hcard, .lex-item, .mcard, [data-search]');
+      items.forEach((el,i)=>{
+        const title=(el.querySelector('.pt,.tt,.hsi,.lext,.mt')||el).textContent.trim().slice(0,80);
+        const body=el.textContent.trim().replace(/\s+/g,' ').slice(0,400);
+        if(title.length<2)return;
+        // Donne un id si absent pour pouvoir scroller dessus
+        if(!el.id)el.id='sx-'+secId+'-'+i;
+        idx.push({tab:secId,id:el.id,title,body,low:(title+' '+body).toLowerCase()});
+      });
+    });
+    return idx;
+  }
+
+  let INDEX=[];
+  function ensureIndex(){if(INDEX.length===0)INDEX=buildIndex();}
+
+  function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function highlight(txt,q){
+    const e=escapeHtml(txt);
+    if(!q)return e;
+    const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+    return e.replace(re,'<mark>$1</mark>');
+  }
+
+  function search(q){
+    q=q.trim().toLowerCase();
+    if(!q){res.innerHTML='<div class="snil">Commence à taper pour rechercher…</div>';return;}
+    const hits=INDEX.filter(it=>it.low.includes(q)).slice(0,60);
+    if(hits.length===0){res.innerHTML='<div class="snil">Aucun résultat pour "<strong>'+escapeHtml(q)+'</strong>"</div>';return;}
+    // Regroupe par onglet
+    const grp={};
+    hits.forEach(h=>{(grp[h.tab]=grp[h.tab]||[]).push(h);});
+    let html='';
+    Object.keys(grp).forEach(tab=>{
+      const t=TABS[tab]||{lbl:tab,ico:'📄'};
+      html+='<div class="sgrp"><div class="sgt">'+t.ico+' '+t.lbl+' ('+grp[tab].length+')</div>';
+      grp[tab].forEach(h=>{
+        const snippet=h.body.length>140?h.body.slice(0,140)+'…':h.body;
+        html+='<div class="sit" data-tab="'+tab+'" data-id="'+h.id+'"><div class="sitt">'+highlight(h.title,q)+'</div><div class="sits">'+highlight(snippet,q)+'</div></div>';
+      });
+      html+='</div>';
+    });
+    res.innerHTML=html;
+    res.querySelectorAll('.sit').forEach(el=>{
+      el.addEventListener('click',()=>goTo(el.dataset.tab,el.dataset.id));
+    });
+  }
+
+  function goTo(tabId,elId){
+    close();
+  
+// Active l'onglet : essaie plusieurs méthodes courantes
+    const btn=document.querySelector('[data-tab="'+tabId+'"], [data-target="'+tabId+'"], .tab[href="#'+tabId+'"]');
+    if(btn&&btn.click)btn.click();
+    else{
+// Fallback : montre la section directement
+      document.querySelectorAll('.sec').forEach(s=>s.style.display='none');
+      const sec=document.getElementById(tabId);
+      if(sec)sec.style.display='';
+    }
+    setTimeout(()=>{
+      const el=document.getElementById(elId);
+      if(el){
+        el.scrollIntoView({behavior:'smooth',block:'center'});
+        el.classList.add('shl');
+        setTimeout(()=>el.classList.remove('shl'),2100);
+      }
+    },150);
+  }
+
+  function open(){ensureIndex();ov.classList.add('on');setTimeout(()=>inp.focus(),50);}
+  function close(){ov.classList.remove('on');inp.value='';res.innerHTML='';}
+
+  fab.addEventListener('click',open);
+  ov.addEventListener('click',e=>{if(e.target===ov)close();});
+  inp.addEventListener('input',e=>search(e.target.value));
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();open();}
+    if(e.key==='Escape'&&ov.classList.contains('on'))close();
+  });
+})();
 </script>
 </body>
 </html>
