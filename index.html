@@ -888,6 +888,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     return idx;
   }
+
   function openSyndromesModal() {
   document.getElementById('modal-syndromes').style.display = 'block';
   document.body.style.overflow = 'hidden';
@@ -897,86 +898,8 @@ document.addEventListener('DOMContentLoaded', function() {
   document.body.style.overflow = '';
   }
 
-  
-  let INDEX=[];
-  function ensureIndex(){if(INDEX.length===0)INDEX=buildIndex();}
+</script>
 
-  function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-  function highlight(txt,q){
-    const e=escapeHtml(txt);
-    if(!q)return e;
-    const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
-    return e.replace(re,'<mark>$1</mark>');
-  }
-
-  function search(q){
-    q=q.trim().toLowerCase();
-    if(!q){res.innerHTML='';return;}
-    const matches=INDEX.filter(it=>it.low.includes(q)).slice(0,80);
-    if(!matches.length){res.innerHTML='<div style="padding:2rem;text-align:center;color:var(--muted)">Aucun résultat pour "'+escapeHtml(q)+'"</div>';return;}
-    const groups={};
-    matches.forEach(m=>{(groups[m.tabKey]=groups[m.tabKey]||[]).push(m);});
-    let html='';
-    Object.keys(TABS).forEach(k=>{
-      if(!groups[k])return;
-      html+='<div class="sgrp"><div class="sgt">'+TABS[k].ico+' '+TABS[k].lbl+' ('+groups[k].length+')</div>';
-      groups[k].forEach((m,i)=>{
-        const dataAttr=m.action==='patho'?'data-pid="'+escapeHtml(m.pid)+'"'
-                     :m.action==='lex'?'data-lex="'+escapeHtml(m.lexWord)+'"'
-                     :'data-el="'+escapeHtml(m.elId)+'"';
-        html+='<div class="sit" data-act="'+m.action+'" data-tab="'+k+'" '+dataAttr+'>'
-            +'<div class="sitt">'+highlight(m.title,q)+'</div>'
-            +(m.sub?'<div class="sits">'+highlight(m.sub,q)+'</div>':'')
-            +'</div>';
-      });
-      html+='</div>';
-    });
-    res.innerHTML=html;
-    res.querySelectorAll('.sit').forEach(el=>{
-      el.addEventListener('click',()=>handleClick(el));
-    });
-  }
-
-  function handleClick(el){
-    const tabKey=el.dataset.tab;
-    const act=el.dataset.act;
-    // Active l'onglet via la fonction go() existante
-    const tabBtn=document.querySelector('.tab.t'+({patho:1,traitement:2,memo:3,lexique:4,hospit:5}[tabKey]));
-    if(tabBtn&&typeof go==='function')go(tabBtn,tabKey);
-    close();
-
-    setTimeout(()=>{
-      if(act==='patho'&&typeof oP==='function'){
-        oP(el.dataset.pid);
-      } else if(act==='lex'){
-        // Remplit la recherche du lexique et scrolle
-        const qL=document.getElementById('qL');
-        if(qL){qL.value=el.dataset.lex;if(typeof bL==='function')bL();}
-        const lo=document.getElementById('lo');
-        if(lo)lo.scrollIntoView({behavior:'smooth',block:'start'});
-      } else {
-        const target=document.getElementById(el.dataset.el);
-        if(target){
-          target.scrollIntoView({behavior:'smooth',block:'center'});
-          target.classList.add('shl');
-          setTimeout(()=>target.classList.remove('shl'),2100);
-        }
-      }
-    },200);
-  }
-
-  function open(){ensureIndex();ov.classList.add('on');setTimeout(()=>inp.focus(),50);}
-  function close(){ov.classList.remove('on');inp.value='';res.innerHTML='';}
-
-  fab.addEventListener('click',open);
-  ov.addEventListener('click',e=>{if(e.target===ov)close();});
-  inp.addEventListener('input',e=>search(e.target.value));
-  document.addEventListener('keydown',e=>{
-    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();open();}
-    if(e.key==='Escape'&&ov.classList.contains('on'))close();
-  });
-})();
-  
 <!-- MODAL SYNDROMES & INTOX -->
 <div id="modal-syndromes" style="
   display:none;
@@ -1101,6 +1024,85 @@ document.addEventListener('DOMContentLoaded', function() {
 
   </div>
 </div>
+  
+  let INDEX=[];
+  function ensureIndex(){if(INDEX.length===0)INDEX=buildIndex();}
+
+  function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function highlight(txt,q){
+    const e=escapeHtml(txt);
+    if(!q)return e;
+    const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+    return e.replace(re,'<mark>$1</mark>');
+  }
+
+  function search(q){
+    q=q.trim().toLowerCase();
+    if(!q){res.innerHTML='';return;}
+    const matches=INDEX.filter(it=>it.low.includes(q)).slice(0,80);
+    if(!matches.length){res.innerHTML='<div style="padding:2rem;text-align:center;color:var(--muted)">Aucun résultat pour "'+escapeHtml(q)+'"</div>';return;}
+    const groups={};
+    matches.forEach(m=>{(groups[m.tabKey]=groups[m.tabKey]||[]).push(m);});
+    let html='';
+    Object.keys(TABS).forEach(k=>{
+      if(!groups[k])return;
+      html+='<div class="sgrp"><div class="sgt">'+TABS[k].ico+' '+TABS[k].lbl+' ('+groups[k].length+')</div>';
+      groups[k].forEach((m,i)=>{
+        const dataAttr=m.action==='patho'?'data-pid="'+escapeHtml(m.pid)+'"'
+                     :m.action==='lex'?'data-lex="'+escapeHtml(m.lexWord)+'"'
+                     :'data-el="'+escapeHtml(m.elId)+'"';
+        html+='<div class="sit" data-act="'+m.action+'" data-tab="'+k+'" '+dataAttr+'>'
+            +'<div class="sitt">'+highlight(m.title,q)+'</div>'
+            +(m.sub?'<div class="sits">'+highlight(m.sub,q)+'</div>':'')
+            +'</div>';
+      });
+      html+='</div>';
+    });
+    res.innerHTML=html;
+    res.querySelectorAll('.sit').forEach(el=>{
+      el.addEventListener('click',()=>handleClick(el));
+    });
+  }
+
+  function handleClick(el){
+    const tabKey=el.dataset.tab;
+    const act=el.dataset.act;
+    // Active l'onglet via la fonction go() existante
+    const tabBtn=document.querySelector('.tab.t'+({patho:1,traitement:2,memo:3,lexique:4,hospit:5}[tabKey]));
+    if(tabBtn&&typeof go==='function')go(tabBtn,tabKey);
+    close();
+
+    setTimeout(()=>{
+      if(act==='patho'&&typeof oP==='function'){
+        oP(el.dataset.pid);
+      } else if(act==='lex'){
+        // Remplit la recherche du lexique et scrolle
+        const qL=document.getElementById('qL');
+        if(qL){qL.value=el.dataset.lex;if(typeof bL==='function')bL();}
+        const lo=document.getElementById('lo');
+        if(lo)lo.scrollIntoView({behavior:'smooth',block:'start'});
+      } else {
+        const target=document.getElementById(el.dataset.el);
+        if(target){
+          target.scrollIntoView({behavior:'smooth',block:'center'});
+          target.classList.add('shl');
+          setTimeout(()=>target.classList.remove('shl'),2100);
+        }
+      }
+    },200);
+  }
+
+  function open(){ensureIndex();ov.classList.add('on');setTimeout(()=>inp.focus(),50);}
+  function close(){ov.classList.remove('on');inp.value='';res.innerHTML='';}
+
+  fab.addEventListener('click',open);
+  ov.addEventListener('click',e=>{if(e.target===ov)close();});
+  inp.addEventListener('input',e=>search(e.target.value));
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();open();}
+    if(e.key==='Escape'&&ov.classList.contains('on'))close();
+  });
+})();
 
 </body>
 </html>
