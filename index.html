@@ -61,6 +61,44 @@ h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:80
 .srch:focus-within{border-color:var(--a1);}
 .srch input{background:none;border:none;outline:none;color:var(--text);font-family:'Nunito',sans-serif;font-size:1rem;flex:1;}
 .srch input::placeholder{color:var(--muted);}
+  /* ===== MINI HEADER ===== */
+.mini-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, rgba(124,109,223,0.12), rgba(245,166,35,0.08));
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.3s ease;
+}
+.mini-header.hidden-header {
+  display: none;
+}
+.mh-logo {
+  font-size: 22px;
+  line-height: 1;
+}
+.mh-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.mh-title {
+  font-weight: 700;
+  font-size: 16px;
+  background: linear-gradient(135deg, #fff, #c5b8ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.mh-sub {
+  font-size: 11px;
+  opacity: 0.65;
+}
+@media (max-width: 480px) {
+  .mh-sub { font-size: 10px; }
+  .mh-title { font-size: 14px; }
+}
 /* CARTES PATHO */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.2rem;}
 .card{background:var(--card);border:1px solid var(--bdr);border-radius:18px;padding:1.4rem;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
@@ -191,10 +229,12 @@ footer{text-align:center;padding:3rem 0 2rem;color:var(--muted);font-size:.8rem;
 </head>
 <body>
 <div class="w">
-<header>
-  <div class="badge">🏥 Service de Psychiatrie</div>
-  <h1>PsychGuide</h1>
-  <p class="sub">Guide étudiant interactif · Psychopathologies · Traitements · Lexique · Hospitalisations</p>
+<header id="miniHeader" class="mini-header hidden-header">
+  <div class="mh-logo">📱</div>
+  <div class="mh-text">
+    <div class="mh-title">MémoPsy</div>
+    <div class="mh-sub">Pavillon Caravelle — Hôpital Pierre Janet</div>
+  </div>
 </header>
 <div class="tabs">
   <button class="tab t0 on" onclick="go(this,'accueil')">🏠 Accueil</button>
@@ -690,8 +730,12 @@ function go(btn, id) {
   document.getElementById('s-' + id).classList.add('on');
   btn.classList.add('on');
   if (id === 'lexique') bL();
-}
 
+  // Masquer le mini-header sur l'accueil, l'afficher ailleurs
+  const mh = document.getElementById('miniHeader');
+  if (mh) mh.classList.toggle('hidden-header', id === 'accueil');
+}
+  
 // Modal
 function showM(html) {
   document.getElementById('md').innerHTML = html;
