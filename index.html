@@ -3,9 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guide en service de psychiatrie </title>
+<title>Guide en service de psychiatrie</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+/* === ACCUEIL === */
+.tab.on.t0{background:linear-gradient(135deg,#a89cf8,#e879a0);border-color:transparent;box-shadow:0 4px 20px rgba(168,156,248,.4);}
+.hero{text-align:center;padding:1rem 0 2.5rem;}
+.hlogo{font-size:3.5rem;margin-bottom:.8rem;display:inline-block;animation:fl 3s ease-in-out infinite;}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.htitle{font-family:'Syne',sans-serif;font-size:clamp(2.4rem,6vw,3.6rem);font-weight:800;background:linear-gradient(135deg,#fff 20%,#a89cf8 55%,#e879a0 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.02em;}
+.hsub{color:var(--muted);font-size:1rem;margin-top:.5rem;}
+.hserv{font-size:.78rem;color:var(--muted);margin-top:1rem;letter-spacing:.05em;opacity:.8;}
+.hserv strong{color:#a89cf8;font-weight:700;}
+.welcome{background:rgba(124,109,245,.07);border:1px solid rgba(124,109,245,.18);border-radius:14px;padding:1rem 1.3rem;margin-bottom:2rem;font-size:.9rem;color:var(--muted);line-height:1.65;}
+.welcome strong{color:var(--text);}
+.qtitle{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:1rem;}
+.qg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.9rem;margin-bottom:2.5rem;}
+.qc{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:1.2rem 1.1rem;cursor:pointer;transition:all .25s;text-align:left;font-family:inherit;color:inherit;border-top:3px solid var(--qcc);}
+.qc:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.15);box-shadow:0 10px 30px rgba(0,0,0,.4);}
+.qci{font-size:1.8rem;margin-bottom:.6rem;display:block;}
+.qct{font-family:'Syne',sans-serif;font-weight:800;font-size:.98rem;color:var(--text);margin-bottom:.3rem;}
+.qcd{font-size:.78rem;color:var(--muted);line-height:1.5;}
+.disc{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25);border-radius:14px;padding:1rem 1.3rem;margin-bottom:1.2rem;display:flex;gap:.8rem;align-items:flex-start;font-size:.84rem;color:var(--muted);line-height:1.6;}
+.disc strong{color:#f5c97a;}
+.disc-ic{font-size:1.3rem;flex-shrink:0;}
+.fb{background:rgba(78,205,196,.07);border:1px solid rgba(78,205,196,.22);border-radius:14px;padding:1rem 1.3rem;margin-bottom:1.5rem;display:flex;gap:.8rem;align-items:flex-start;font-size:.84rem;color:var(--muted);line-height:1.6;}
+.fb-ic{font-size:1.3rem;flex-shrink:0;}
+.fb strong{color:#7fdcd3;}
+.fb a{color:#7fdcd3;font-weight:700;text-decoration:none;border-bottom:1px dashed rgba(127,220,211,.4);}
+.fb a:hover{border-bottom-style:solid;}
+.acc-foot{text-align:center;padding:1.5rem 0 .5rem;border-top:1px solid var(--bdr);margin-top:1.5rem;color:var(--muted);font-size:.78rem;line-height:1.7;}
+.acc-foot .sig{color:#a89cf8;font-weight:700;}
+.acc-foot .upd{font-size:.7rem;opacity:.65;margin-top:.3rem;}
+@media(max-width:500px){.qg{grid-template-columns:1fr 1fr;gap:.7rem;}.qc{padding:1rem .9rem;}.qci{font-size:1.5rem;}}
 :root{--bg:#0f1117;--card:#1a1d2e;--card2:#1e2235;--a1:#7c6df5;--a2:#f5a623;--a3:#4ecdc4;--a4:#ff6b6b;--a5:#a8e063;--pink:#e879a0;--sky:#38bdf8;--text:#e8eaf0;--muted:#8890a8;--bdr:rgba(255,255,255,0.07);}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
@@ -167,12 +197,70 @@ footer{text-align:center;padding:3rem 0 2rem;color:var(--muted);font-size:.8rem;
   <p class="sub">Guide étudiant interactif · Psychopathologies · Traitements · Lexique · Hospitalisations</p>
 </header>
 <div class="tabs">
-  <button class="tab t1 on" onclick="go(this,'patho')">🧠 Psychopathologies</button>
+  <button class="tab t0 on" onclick="go(this,'accueil')">🏠 Accueil</button>
+  <button class="tab t1"    onclick="go(this,'patho')">🧠 Psychopathologies</button>
   <button class="tab t2"    onclick="go(this,'traitement')">💊 Traitements</button>
   <button class="tab t3"    onclick="go(this,'memo')">⚡ Mémo Rapide</button>
   <button class="tab t4"    onclick="go(this,'lexique')">📖 Lexique</button>
   <button class="tab t5"    onclick="go(this,'hospit')">🏥 Hospitalisations</button>
 </div>
+<!-- ============ ACCUEIL ============ -->
+<section class="sec on" id="accueil">
+  <div class="hero">
+    <div class="hlogo">📱</div>
+    <h1 class="htitle">MémoPsy</h1>
+    <p class="hsub">Guide simplifié à portée de smartphone</p>
+    <p class="hserv">Pavillon Caravelle — <strong>Hôpital Pierre Janet</strong></p>
+  </div>
+  <div class="welcome">
+    👋 <strong>Bienvenue !</strong> Cet outil a été conçu pour accompagner les étudiants en stage et offrir un repère rapide aux soignants du service. Naviguez via les onglets en haut ou les raccourcis ci-dessous.
+  </div>
+  <div class="qtitle">🧭 Accès rapide</div>
+  <div class="qg">
+    <button class="qc" style="--qcc:#7c6df5" onclick="goTab('patho')">
+      <span class="qci">🧠</span>
+      <div class="qct">Psychopathologies</div>
+      <div class="qcd">Troubles, symptômes, prises en charge</div>
+    </button>
+    <button class="qc" style="--qcc:#f5a623" onclick="goTab('traitement')">
+      <span class="qci">💊</span>
+      <div class="qct">Traitements</div>
+      <div class="qcd">Psychotropes, indications, surveillance</div>
+    </button>
+    <button class="qc" style="--qcc:#4ecdc4" onclick="goTab('memo')">
+      <span class="qci">⚡</span>
+      <div class="qct">Mémo rapide</div>
+      <div class="qcd">Repères pratiques au quotidien</div>
+    </button>
+    <button class="qc" style="--qcc:#e879a0" onclick="goTab('lexique')">
+      <span class="qci">📖</span>
+      <div class="qct">Lexique</div>
+      <div class="qcd">Vocabulaire psychiatrique</div>
+    </button>
+    <button class="qc" style="--qcc:#38bdf8" onclick="goTab('hospit')">
+      <span class="qci">🏥</span>
+      <div class="qct">Hospitalisations</div>
+      <div class="qcd">Modes légaux & démarches</div>
+    </button>
+    <button class="qc" style="--qcc:#a89cf8" onclick="document.querySelector('.sfab')?.click()">
+      <span class="qci">🔍</span>
+      <div class="qct">Recherche</div>
+      <div class="qcd">Trouver n'importe quel terme <kbd style="font-size:.65rem;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;">Ctrl+K</kbd></div>
+    </button>
+  </div>
+  <div class="disc">
+    <span class="disc-ic">⚠️</span>
+    <div><strong>Avertissement.</strong> MémoPsy est un outil pédagogique d'aide à la prise en soin. Il ne remplace en aucun cas le jugement clinique, les protocoles du service ou les recommandations officielles (HAS, ANSM, AMM). En cas de doute, référez-vous toujours à l'équipe médicale.</div>
+  </div>
+  <div class="fb">
+    <span class="fb-ic">✉️</span>
+    <div>Une <strong>suggestion</strong>, une <strong>correction</strong> ou une <strong>erreur</strong> à signaler ? Contactez le service à <a href="mailto:caravelle.hpj@ch-havre.fr?subject=MémoPsy%20-%20Suggestion">caravelle.hpj@ch-havre.fr</a>. Vos retours nous aident à améliorer cet outil !</div>
+  </div>
+  <div class="acc-foot">
+    <p>Conçu avec 💙 par <span class="sig">Morgan C.</span> — Équipe IDE, Pavillon Caravelle</p>
+    <p class="upd">Mis à jour régulièrement</p>
+  </div>
+</section>
 
 <!-- PSYCHOPATHOLOGIES -->
 <section class="sec on" id="s-patho">
@@ -589,6 +677,12 @@ footer{text-align:center;padding:3rem 0 2rem;color:var(--muted);font-size:.8rem;
 </div>
 
 <script>
+// Navigation depuis les cartes d'accueil
+function goTab(id){
+  const btn = document.querySelector(`.tab[onclick*="'${id}'"]`);
+  if(btn) go(btn, id);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
 // Navigation
 function go(btn, id) {
   document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
