@@ -61,15 +61,18 @@ h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:80
 .srch:focus-within{border-color:var(--a1);}
 .srch input{background:none;border:none;outline:none;color:var(--text);font-family:'Nunito',sans-serif;font-size:1rem;flex:1;}
 .srch input::placeholder{color:var(--muted);}
-  /* ===== MINI HEADER ===== */
+/* ===== MINI HEADER ===== */
 .mini-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 16px;
   background: linear-gradient(135deg, rgba(124,109,223,0.12), rgba(245,166,35,0.08));
   border-bottom: 1px solid rgba(255,255,255,0.06);
   transition: all 0.3s ease;
+  text-align: center;
 }
 .mini-header.hidden-header {
   display: none;
