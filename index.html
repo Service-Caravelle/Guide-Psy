@@ -165,6 +165,18 @@ h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:80
 .ld{font-size:.84rem;color:var(--muted);line-height:1.65;margin-bottom:.6rem;}
 .lex{font-size:.77rem;color:rgba(232,121,160,.7);background:rgba(232,121,160,.07);border-radius:8px;padding:.4rem .7rem;font-style:italic;line-height:1.5;}
 .lex::before{content:'💬 Ex : ';font-style:normal;}
+  /* Sous-filtres */
+.lsc {display: flex;flex-wrap: wrap;gap: .4rem;padding: .5rem 0 .8rem;}
+.lsb-btn {padding: .25rem .75rem;border-radius: 20px;border: 1.5px solid var(--border);background: transparent;color: var(--text);font-size: .78rem;cursor: pointer;transition: all .2s;text-transform: capitalize;}
+.lsb-btn.on {background: var(--accent);color: #fff;border-color: var(--accent);}
+/* Badge sous-cat sur la carte */
+.lsb {font-size: .65rem;background: color-mix(in srgb, var(--lc) 15%, transparent);color: var(--lc);border: 1px solid color-mix(in srgb, var(--lc) 30%, transparent);border-radius: 10px;padding: .1rem .45rem;margin-left: .3rem;vertical-align: middle;text-transform: capitalize;}
+/* Lettre repliable */
+.ll {display: flex;justify-content: space-between;align-items: center;cursor: pointer;user-select: none;}
+.ll-arrow {transition: transform .25s;font-size: .9rem;opacity: .6;}
+.lg.collapsed .ll-arrow {transform: rotate(-90deg);}
+.lg.collapsed .lgr {display: none;}
+
 /* HOSPIT */
 .hi{background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.2);border-radius:16px;padding:1.2rem 1.5rem;margin-bottom:2rem;font-size:.88rem;color:var(--muted);line-height:1.7;}
 .hi strong{color:#7dd3f8;}
