@@ -475,16 +475,20 @@ footer{text-align:center;padding:3rem 0 2rem;color:var(--muted);font-size:.8rem;
 <!-- LEXIQUE -->
 <section class="sec" id="s-lexique">
 <div class="srch"><span>🔍</span><input id="qL" placeholder="Rechercher un terme…" oninput="bL()"></div>
+<!-- Filtres familles -->
 <div class="lf">
-<button class="lfb on" onclick="sLC('all',this)">Tous</button>
-<button class="lfb" onclick="sLC('humeur',this)">🌡️ Humeur</button>
-<button class="lfb" onclick="sLC('psychose',this)">🌀 Psychose</button>
-<button class="lfb" onclick="sLC('moteur',this)">🏃 Motricité</button>
-<button class="lfb" onclick="sLC('cognition',this)">🧩 Cognition</button>
-<button class="lfb" onclick="sLC('comportement',this)">🎭 Comportement</button>
-<button class="lfb" onclick="sLC('somatique',this)">🫀 Somatique</button>
-<button class="lfb" onclick="sLC('relation',this)">🤝 Personnalité</button>
+  <button class="lfb on" onclick="sLC('all',this)">Tous</button>
+  <button class="lfb" onclick="sLC('humeur',this)">🌡️ Humeur</button>
+  <button class="lfb" onclick="sLC('psychose',this)">🌀 Psychose</button>
+  <button class="lfb" onclick="sLC('moteur',this)">🏃 Motricité</button>
+  <button class="lfb" onclick="sLC('cognition',this)">🧩 Cognition</button>
+  <button class="lfb" onclick="sLC('comportement',this)">🎭 Comportement</button>
+  <button class="lfb" onclick="sLC('somatique',this)">🫀 Somatique</button>
+  <button class="lfb" onclick="sLC('relation',this)">🤝 Personnalité</button>
 </div>
+<!-- Sous-catégories (dynamique) -->
+<div id="lsc" class="lsc"></div>
+  
 <div id="lo"></div>
   <div style="margin-top:3rem;background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.2);border-radius:16px;padding:1.2rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
     <span style="font-size:1.5rem;">📚</span>
