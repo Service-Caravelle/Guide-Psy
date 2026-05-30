@@ -1084,32 +1084,92 @@ const LEX = [
   { w:"Passage à l'acte", e:"Acting out", c:"comportement", col:"#ef4444",d:"Action impulsive court-circuitant la pensée et la parole, déchargeant une tension psychique non élaborée. Auto-agressif, hétéro-agressif ou transgressif.",ex:"Mme Z., borderline, après une dispute : se scarifie les avant-bras sans pouvoir en parler avant." }
 ];
   
+// Remplace bL()
 function bL() {
   const q = (document.getElementById('qL') || {}).value || '';
   let data = LC === 'all' ? LEX : LEX.filter(i => i.c === LC);
-  if (q) data = data.filter(i => i.w.toLowerCase().includes(q.toLowerCase()) || i.d.toLowerCase().includes(q.toLowerCase()));
+  if (LSC !== 'all') data = data.filter(i => i.sub === LSC);
+  if (q) data = data.filter(i =>
+    i.w.toLowerCase().includes(q.toLowerCase()) ||
+    i.d.toLowerCase().includes(q.toLowerCase())
+  );
   data.sort((a, b) => a.w.localeCompare(b.w, 'fr'));
   const grps = {};
-  data.forEach(i => { const l = i.w[0].toUpperCase(); if (!grps[l]) grps[l] = []; grps[l].push(i); });
+  data.forEach(i => {
+    const l = i.w[0].toUpperCase();
+    if (!grps[l]) grps[l] = [];
+    grps[l].push(i);
+  });
   const out = document.getElementById('lo');
-  if (!data.length) { out.innerHTML = '<p style="color:var(--muted);text-align:center;padding:3rem">Aucun terme trouvé.</p>'; return; }
+  if (!data.length) {
+    out.innerHTML = '<p style="color:var(--muted);text-align:center;padding:3rem">Aucun terme trouvé.</p>';
+    return;
+  }
   out.innerHTML = Object.keys(grps).sort().map(l =>
-    `<div class="lg"><div class="ll">${l}</div><div class="lgr">${grps[l].map(i =>
-      `<div class="lc" style="--lc:${i.col}"><div class="lw">${i.w}${i.e ? `<span class="le">(${i.e})</span>` : ''}<span class="lb">${CL[i.c]||i.c}</span></div><div class="ld">${i.d}</div>${i.ex ? `<div class="lex">${i.ex}</div>` : ''}</div>`
-    ).join('')}</div></div>`
+    `<div class="lg">
+      <div class="ll" onclick="toggleGrp(this)">
+        <span>${l}</span>
+        <span class="ll-arrow">▾</span>
+      </div>
+      <div class="lgr">${grps[l].map(i =>
+        `<div class="lc" style="--lc:${i.col}">
+          <div class="lw">
+            ${i.w}
+            ${i.e ? `<span class="le">(${i.e})</span>` : ''}
+            <span class="lb">${CL[i.c]||i.c}</span>
+            ${i.sub ? `<span class="lsb">${i.sub}</span>` : ''}
+          </div>
+          <div class="ld">${i.d}</div>
+          ${i.ex ? `<div class="lex">${i.ex}</div>` : ''}
+        </div>`
+      ).join('')}</div>
+    </div>`
   ).join('');
 }
 
+// Toggle repli lettre
+function toggleGrp(el) {
+  const grp = el.closest('.lg');
+  grp.classList.toggle('collapsed');
+}
+
+// Filtre famille
 function sLC(cat, btn) {
   LC = cat;
+  LSC = 'all';
   document.querySelectorAll('.lfb').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
+  renderSubCats();
   bL();
+}
+
+// Filtre sous-cat
+function sLSC(sub, btn) {
+  LSC = sub;
+  document.querySelectorAll('.lsb-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  bL();
+}
+
+// Affiche les sous-cats selon famille active
+function renderSubCats() {
+  const zone = document.getElementById('lsc');
+  if (!zone) return;
+  if (LC === 'all' || !SUBS[LC]) {
+    zone.innerHTML = '';
+    return;
+  }
+  zone.innerHTML =
+    `<button class="lsb-btn on" onclick="sLSC('all',this)">Tous</button>` +
+    SUBS[LC].map(s =>
+      `<button class="lsb-btn" onclick="sLSC('${s}',this)">${s}</button>`
+    ).join('');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   if (document.getElementById('s-lexique').classList.contains('on')) bL();
 });
+  
 /* === RECHERCHE GLOBALE === */
 (function(){
   const fab=document.getElementById('sfab');
