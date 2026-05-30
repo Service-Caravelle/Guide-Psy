@@ -166,9 +166,12 @@ h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:80
 .lex{font-size:.77rem;color:rgba(232,121,160,.7);background:rgba(232,121,160,.07);border-radius:8px;padding:.4rem .7rem;font-style:italic;line-height:1.5;}
 .lex::before{content:'💬 Ex : ';font-style:normal;}
   /* Sous-filtres */
-.lsc {display: flex;flex-wrap: wrap;gap: .4rem;padding: .5rem 0 .8rem;}
-.lsb-btn {padding: .25rem .75rem;border-radius: 20px;border: 1.5px solid var(--border);background: transparent;color: var(--text);font-size: .78rem;cursor: pointer;transition: all .2s;text-transform: capitalize;}
-.lsb-btn.on {background: var(--accent);color: #fff;border-color: var(--accent);}
+.lsc {display: flex;flex-wrap: wrap;gap: .4rem;padding: .6rem .8rem .8rem 1.2rem;margin-top: -.4rem;margin-bottom: .6rem;position: relative;}
+.lsc::before {content: '';position: absolute;left: .55rem;top: 0;bottom: .8rem;width: 2px;background: linear-gradient(to bottom, var(--lsc-color, #a78bfa), transparent);border-radius: 2px;opacity: .5;}
+.lsb-btn {position: relative;padding: .28rem .85rem;border-radius: 20px;border: 1.5px solid color-mix(in srgb, var(--lsc-color, #a78bfa) 35%, transparent);background: color-mix(in srgb, var(--lsc-color, #a78bfa) 8%, transparent);color: color-mix(in srgb, var(--lsc-color, #a78bfa) 90%, #fff);font-size: .8rem;font-weight: 500;cursor: pointer;transition: all .2s;text-transform: capitalize;letter-spacing: .01em;}
+.lsb-btn::before {content: '·';margin-right: .35rem;opacity: .6;}
+.lsb-btn:hover {background: color-mix(in srgb, var(--lsc-color, #a78bfa) 20%, transparent);border-color: var(--lsc-color, #a78bfa);color: #fff;transform: translateX(2px);}
+.lsb-btn.on {background: color-mix(in srgb, var(--lsc-color, #a78bfa) 25%, transparent);border-color: var(--lsc-color, #a78bfa);color: #fff;box-shadow: 0 0 8px color-mix(in srgb, var(--lsc-color, #a78bfa) 30%, transparent);}
 /* Badge sous-cat sur la carte */
 .lsb {font-size: .65rem;background: color-mix(in srgb, var(--lc) 15%, transparent);color: var(--lc);border: 1px solid color-mix(in srgb, var(--lc) 30%, transparent);border-radius: 10px;padding: .1rem .45rem;margin-left: .3rem;vertical-align: middle;text-transform: capitalize;}
 /* Lettre repliable */
@@ -952,8 +955,14 @@ function oD(id) {
 const CL = {humeur:'🌡️ Humeur',psychose:'🌀 Psychose',moteur:'🏃 Motricité',cognition:'🧩 Cognition',comportement:'🎭 Comportement',somatique:'🫀 Somatique',relation:'🤝 Personnalité'
 };
 
-const SUBS = {humeur:       ['dépressif','maniaque','mixte'],psychose:     ['positif','négatif','désorganisation'],moteur:       ['ralentissement','agitation','catatonie'],cognition:    ['mémoire','attention','langage'],comportement: ['impulsivité','compulsions','évitement'],somatique:    ['sommeil','alimentation','neurovégétatif'],relation:     ['cluster a','cluster b','cluster c']
+const SUBS = {humeur:       ['📉 dépressif', '📈 maniaque', '〰️ mixte'],psychose:     ['✦ positif', '✧ négatif', '◈ désorganisation'],moteur:       ['🐢 ralentissement', '⚡ agitation', '🗿 catatonie'],cognition:    ['🗂️ mémoire', '🎯 attention', '💬 langage'],
+  comportement: ['💢 impulsivité', '🔁 compulsions', '🚪 évitement'],somatique:    ['🌙 sommeil', '🍽️ alimentation', '⚙️ neurovégétatif'],relation:     ['🅐 cluster a', '🅑 cluster b', '🅒 cluster c']
+             };
+  
+const CAT_COLORS = {humeur:       '#f472b6',psychose:     '#a78bfa',moteur:       '#34d399',cognition:    '#60a5fa',comportement: '#fb923c',somatique:    '#f87171',relation:     '#fbbf24'
 };
+
+
 
 let LC = 'all';
 let LSC = 'all';
@@ -1184,6 +1193,24 @@ function renderSubCats() {
 
 document.addEventListener('DOMContentLoaded', function() {
   if (document.getElementById('s-lexique').classList.contains('on')) bL();
+
+function renderSubCats() {
+  const zone = document.getElementById('lsc');
+  if (!zone) return;
+  if (LC === 'all' || !SUBS[LC]) {
+    zone.innerHTML = '';
+    zone.style.setProperty('--lsc-color', '');
+    return;
+  }
+  const col = CAT_COLORS[LC] || '#a78bfa';
+  zone.style.setProperty('--lsc-color', col);
+  zone.innerHTML =
+    `<button class="lsb-btn on" onclick="sLSC('all',this)">Tous</button>` +
+    SUBS[LC].map(s =>
+      `<button class="lsb-btn" onclick="sLSC('${s}',this)">${s}</button>`
+    ).join('');
+}
+
 });
   
 /* === RECHERCHE GLOBALE === */
