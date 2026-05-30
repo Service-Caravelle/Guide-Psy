@@ -1050,32 +1050,109 @@ const LEX = [
   {w:'Passage à l\'acte',e:'Acting out',c:'comportement',sub:'impulsivite',col:'#4ecdc4',d:'Action impulsive court-circuitant la pensée et la parole, déchargeant une tension psychique non élaborée. Auto-agressif, hétéro-agressif ou transgressif.',ex:'"Borderline, après une dispute : se scarifie les avant-bras sans pouvoir en parler avant."'}
 ];
   
-function bL() {
-  const q = (document.getElementById('qL') || {}).value || '';
-  let data = LC === 'all' ? LEX : LEX.filter(i => i.c === LC);
-  if (q) data = data.filter(i => i.w.toLowerCase().includes(q.toLowerCase()) || i.d.toLowerCase().includes(q.toLowerCase()));
-  data.sort((a, b) => a.w.localeCompare(b.w, 'fr'));
-  const grps = {};
-  data.forEach(i => { const l = i.w[0].toUpperCase(); if (!grps[l]) grps[l] = []; grps[l].push(i); });
-  const out = document.getElementById('lo');
-  if (!data.length) { out.innerHTML = '<p style="color:var(--muted);text-align:center;padding:3rem">Aucun terme trouvé.</p>'; return; }
-  out.innerHTML = Object.keys(grps).sort().map(l =>
-    `<div class="lg"><div class="ll">${l}</div><div class="lgr">${grps[l].map(i =>
-      `<div class="lc" style="--lc:${i.col}"><div class="lw">${i.w}${i.e ? `<span class="le">(${i.e})</span>` : ''}<span class="lb">${CL[i.c]||i.c}</span></div><div class="ld">${i.d}</div>${i.ex ? `<div class="lex">${i.ex}</div>` : ''}</div>`
-    ).join('')}</div></div>`
-  ).join('');
+function initLex(){
+  renderFilters();
+  renderLex();
 }
 
-function sLC(cat, btn) {
-  LC = cat;
-  document.querySelectorAll('.lfb').forEach(b => b.classList.remove('on'));
+function renderFilters(){
+  const cats = document.getElementById('lex-cats');
+  cats.innerHTML = `<button class="lfb on" onclick="setLC('all',this)">✨ Tous</button>` +
+    Object.entries(CL).map(([k,v])=>
+      `<button class="lfb" onclick="setLC('${k}',this)">${v}</button>`
+    ).join('');
+
+  document.getElementById('lex-subs').innerHTML = '';
+}
+
+function setLC(cat, btn){
+  LC = cat; LS = 'all';
+  document.querySelectorAll('#lex-cats .lfb').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  bL();
+
+  const subsDiv = document.getElementById('lex-subs');
+  if(cat !== 'all' && SUBS[cat]){
+    subsDiv.innerHTML =
+      `<button class="lfb on" onclick="setLS('all',this)">— Tous</button>` +
+      SUBS[cat].map(s=>
+        `<button class="lfb" onclick="setLS('${s.k}',this)">${s.l}</button>`
+      ).join('');
+  } else {
+    subsDiv.innerHTML = '';
+  }
+  renderLex();
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  if (document.getElementById('s-lexique').classList.contains('on')) bL();
-});
+function setLS(sub, btn){
+  LS = sub;
+  document.querySelectorAll('#lex-subs .lfb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderLex();
+}
+
+function bL(q){ LQ = q.trim().toLowerCase(); renderLex(); }
+
+function renderLex(){
+  const out = document.getElementById('lo');
+
+  let data = LEX.filter(t => {
+    const matchCat = LC === 'all' || t.c === LC;
+    const matchSub = LS === 'all' || t.sub === LS;
+    const matchQ   = !LQ ||
+      t.w.toLowerCase().includes(LQ) ||
+      t.d.toLowerCase().includes(LQ) ||
+      (t.e && t.e.toLowerCase().includes(LQ));
+    return matchCat && matchSub && matchQ;
+  });
+
+  if(!data.length){
+    out.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--muted);">
+      😶 Aucun terme trouvé
+    </div>`;
+    return;
+  }
+
+  const groups = {};
+  data.sort((a,b)=>a.w.localeCompare(b.w,'fr')).forEach(t => {
+    const l = t.w[0].toUpperCase();
+    if(!groups[l]) groups[l] = [];
+    groups[l].push(t);
+  });
+
+  out.innerHTML = Object.entries(groups).map(([letter, terms]) => `
+    <div class="lg">
+      <div class="ll">${letter}</div>
+      <div class="lgr">
+        ${terms.map(t => cardLex(t)).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function cardLex(t){
+  const badge = LC === 'all'
+    ? `<span class="lb">${CL[t.c] ?? t.c}</span>` : '';
+  const subLabel = SUBS[t.c]
+    ? (SUBS[t.c].find(s=>s.k===t.sub)?.l ?? '')
+    : '';
+  const subBadge = subLabel
+    ? `<span class="lb" style="opacity:.7">${subLabel}</span>` : '';
+
+  return `
+    <div class="lc" style="--lc:${t.col}">
+      <div class="lw">
+        ${t.w}
+        ${t.e ? `<span class="le">${t.e}</span>` : ''}
+      </div>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem;">
+        ${badge}${subBadge}
+      </div>
+      <div class="ld">${t.d}</div>
+      ${t.ex ? `<div class="lex">${t.ex}</div>` : ''}
+    </div>
+  `;
+}
+
 /* === RECHERCHE GLOBALE === */
 (function(){
   const fab=document.getElementById('sfab');
