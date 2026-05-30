@@ -1093,7 +1093,6 @@ const LEX = [
 function bL() {
   const q = (document.getElementById('qL') || {}).value || '';
   let data = LC === 'all' ? LEX : LEX.filter(i => i.c === LC);
-  document.getElementById('lo').innerHTML = '<pre>' + [...new Set(LEX.map(i=>i.sub))].join('\n') + '</pre>';return;
   if (LSC !== 'all') data = data.filter(i => i.sub === LSC);
   if (q) data = data.filter(i =>
     i.w.toLowerCase().includes(q.toLowerCase()) ||
