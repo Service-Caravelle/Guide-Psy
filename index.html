@@ -1166,9 +1166,10 @@ function renderSubCats() {
   }
   zone.innerHTML =
     `<button class="lsb-btn on" onclick="sLSC('all',this)">Tous</button>` +
-    SUBS[LC].map(s =>
-      `<button class="lsb-btn" onclick="sLSC('${s}',this)">${s}</button>`
-    ).join('');
+    SUBS[LC].map(s => {
+      const key = s.replace(/^[^a-zA-ZÀ-ÿ]+/, '').trim();
+      return `<button class="lsb-btn" onclick="sLSC('${key}',this)">${s}</button>`;
+    }).join('');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
