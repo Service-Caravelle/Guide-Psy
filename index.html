@@ -933,8 +933,14 @@ function oD(id) {
 }
 
 // Lexique
-const CL = {humeur:'🌡️ Humeur',psychose:'🌀 Psychose',moteur:'🏃 Motricité',cognition:'🧩 Cognition',comportement:'🎭 Comportement',somatique:'🫀 Somatique',relation:'🤝 Personnalité'};
+const CL = {humeur:'🌡️ Humeur',psychose:'🌀 Psychose',moteur:'🏃 Motricité',cognition:'🧩 Cognition',comportement:'🎭 Comportement',somatique:'🫀 Somatique',relation:'🤝 Personnalité'
+};
+
+const SUBS = {humeur:       ['dépressif','maniaque','mixte'],psychose:     ['positif','négatif','désorganisation'],moteur:       ['ralentissement','agitation','catatonie'],cognition:    ['mémoire','attention','langage'],comportement: ['impulsivité','compulsions','évitement'],somatique:    ['sommeil','alimentation','neurovégétatif'],relation:     ['cluster a','cluster b','cluster c']
+};
+
 let LC = 'all';
+let LSC = 'all';
 const LEX = [
   {w:'Aboulie',e:'gr. a- + boulè (volonté)',c:'humeur',col:'#e879a0',d:'Diminution ou perte de la volonté et de la capacité à initier une action, sans déficit moteur. Le patient veut mais ne peut pas se mettre en mouvement.',ex:'"Il reste allongé toute la journée, sait qu\'il devrait se lever mais n\'y arrive pas."'},
   {w:'Agitation psychomotrice',e:'lat. agitare',c:'moteur',col:'#f5a623',d:'Excitation motrice et psychique excessive : mouvements incessants, incapacité à rester immobile. Liée à l\'anxiété, à une manie, un état confusionnel ou un sevrage.',ex:'"Le patient arpente le couloir sans arrêt, se lève et se rassoit toutes les 30 secondes."'},
